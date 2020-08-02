@@ -3,7 +3,7 @@ import assign from 'object-assign'
 
 let pid = 0
 
-function emitVueEvent (event) {
+function emitVueEvent(event) {
   this.player.on(event, (data) => {
     this.$emit(event, data, this.player)
   })
@@ -51,13 +51,17 @@ export default {
       default: true
     }
   },
-  render (h) {
-    return h('div', { attrs: { id: this.elementId } })
+  render(h) {
+    return h('div', {
+      attrs: {
+        id: this.elementId
+      }
+    })
   },
   watch: {
     videoId: 'update'
   },
-  data () {
+  data() {
     pid += 1
 
     return {
@@ -72,22 +76,25 @@ export default {
      * @param {Number} videoId
      * @return {LoadVideoPromise}
      */
-    update (videoId) {
+    update(videoId) {
       return this.player.loadVideo(videoId)
     },
-    play () {
+    play() {
       return this.player.play()
     },
-    pause () {
+    setCurrentFrame(_loc = 0.0) {
+      return this.player.setCurrentFrame(_loc)
+    },
+    pause() {
       return this.player.pause()
     },
-    mute () {
+    mute() {
       return this.player.setVolume(0)
     },
-    unmute (volume = 0.5) {
+    unmute(volume = 0.5) {
       return this.player.setVolume(volume)
     },
-    setEvents () {
+    setEvents() {
       const vm = this
 
       this.player.ready()
@@ -101,7 +108,7 @@ export default {
       eventsToEmit.forEach(event => emitVueEvent.call(vm, event))
     }
   },
-  mounted () {
+  mounted() {
     const options = {
       id: this.videoId,
       width: this.playerWidth,
@@ -110,13 +117,15 @@ export default {
       autoplay: this.autoplay,
       controls: this.controls
     }
-    if (this.videoUrl) { options.url = this.videoUrl }
+    if (this.videoUrl) {
+      options.url = this.videoUrl
+    }
 
     this.player = new Player(this.elementId, assign(options, this.options))
 
     this.setEvents()
   },
-  beforeDestroy () {
+  beforeDestroy() {
     this.player.unload()
   }
 }
